@@ -31,6 +31,8 @@ public class MainActivity extends Activity {
                     case 1:
                         startActivity(new Intent(MainActivity.this, Confirmacion.class));
                         break;
+                    case 4:
+                        startActivity(new Intent(MainActivity.this, Pasos.class)); break;
                 }
             }
         });
