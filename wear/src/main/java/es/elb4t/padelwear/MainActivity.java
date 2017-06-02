@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.wearable.view.CurvedChildLayoutManager;
 import android.support.wearable.view.WatchViewStub;
 import android.support.wearable.view.WearableRecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Integer tag = (Integer) v.getTag();
+                Log.e("LLISTA-----",tag.toString());
                 switch (tag) {
                     case 0:
                         startActivity(new Intent(MainActivity.this, Contador.class));

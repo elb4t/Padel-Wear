@@ -4,6 +4,7 @@
 
     <uses-feature android:name="android.hardware.type.watch" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -25,6 +26,8 @@
         <activity android:name=".Historial"/>
         <activity android:name=".CuentaAtras" />
         <activity android:name=".Contador" android:theme="@style/AppThemeNoSwipeToDismiss" />
+
+        <uses-library android:name="com.google.android.wearable" android:required="false" />
     </application>
 
 </manifest>
