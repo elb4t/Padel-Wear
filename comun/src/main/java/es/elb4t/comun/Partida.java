@@ -1,4 +1,4 @@
-package com.example.comun;
+package es.elb4t.comun;
 
 import java.util.Vector;
 

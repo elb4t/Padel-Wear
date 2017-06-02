@@ -1,4 +1,4 @@
-package com.example.comun;
+package es.elb4t.comun;
 
 import android.content.Context;
 import android.graphics.Paint;
