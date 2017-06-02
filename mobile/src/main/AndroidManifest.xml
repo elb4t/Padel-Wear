@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="es.elb4t.padelwear">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,11 +21,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".WearReceiver" android:exported="false">
+
+        <receiver
+            android:name=".WearReceiver"
+            android:exported="false">
             <intent-filter>
-                <action android:name="es.elb4t.padelwear.ACTION_DEMAND"/>
+                <action android:name="es.elb4t.padelwear.ACTION_DEMAND" />
             </intent-filter>
         </receiver>
+        <activity android:name=".Contador"/>
+        <activity android:name=".Notificaciones"/>
     </application>
 
 </manifest>
