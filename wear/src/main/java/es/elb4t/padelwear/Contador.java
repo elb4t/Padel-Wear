@@ -14,11 +14,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageApi;
@@ -41,20 +43,21 @@ import es.elb4t.comun.Puntuacion;
  */
 
 public class Contador extends WearableActivity implements MessageApi.MessageListener,
-        GoogleApiClient.ConnectionCallbacks,DataApi.DataListener{
+        GoogleApiClient.ConnectionCallbacks, DataApi.DataListener {
     private static final String MOVIL_ARRANCAR_ACTIVIDAD = "/arrancar_actividad";
     private GoogleApiClient apiClient;
 
     private static final String WEAR_PUNTUACION = "/puntuacionWear";
     private static final String MOBILE_PUNTUACION = "/puntuacionMobile";
-    private static final String KEY_MIS_PUNTOS="com.example.padel.key.mis_puntos";
-    private static final String KEY_MIS_JUEGOS="com.example.padel.key.mis_juegos";
-    private static final String KEY_MIS_SETS="com.example.padel.key.mis_sets";
-    private static final String KEY_SUS_PUNTOS="com.example.padel.key.sus_puntos";
-    private static final String KEY_SUS_JUEGOS="com.example.padel.key.sus_juegos";
-    private static final String KEY_SUS_SETS="com.example.padel.key.sus_sets";
-    private static final String KEY_EQUIPO="com.example.padel.key.equipo";
-    private byte misP, susP, misJ, susJ, misS, susS;
+    private static final String KEY_MIS_PUNTOS = "com.example.padel.key.mis_puntos";
+    private static final String KEY_MIS_JUEGOS = "com.example.padel.key.mis_juegos";
+    private static final String KEY_MIS_SETS = "com.example.padel.key.mis_sets";
+    private static final String KEY_SUS_PUNTOS = "com.example.padel.key.sus_puntos";
+    private static final String KEY_SUS_JUEGOS = "com.example.padel.key.sus_juegos";
+    private static final String KEY_SUS_SETS = "com.example.padel.key.sus_sets";
+    private static final String KEY_EQUIPO = "com.example.padel.key.equipo";
+    private String misP, susP;
+    private byte misJ, susJ, misS, susS;
 
     private Partida partida;
     private TextView misPuntos, misJuegos, misSets,
@@ -180,6 +183,38 @@ public class Contador extends WearableActivity implements MessageApi.MessageList
 
 
         mandarMensaje(MOVIL_ARRANCAR_ACTIVIDAD, "");
+        PendingResult<DataItemBuffer> resultado = Wearable.DataApi.getDataItems(apiClient);
+        resultado.setResultCallback(new ResultCallback<DataItemBuffer>() {
+            @Override
+            public void onResult(DataItemBuffer dataItems) {
+                for (DataItem dataItem : dataItems) {
+                    if (dataItem.getUri().getPath().equals(WEAR_PUNTUACION)) {
+                        DataMap dataMap = DataMapItem.fromDataItem(dataItem).getDataMap();
+                        misP = dataMap.getString(KEY_MIS_PUNTOS);
+                        susP = dataMap.getString(KEY_SUS_PUNTOS);
+                        misJ = dataMap.getByte(KEY_MIS_JUEGOS);
+                        susJ = dataMap.getByte(KEY_SUS_JUEGOS);
+                        misS = dataMap.getByte(KEY_MIS_SETS);
+                        susS = dataMap.getByte(KEY_SUS_SETS);
+
+                        Log.e("WEAR", "getBytes ---------------");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                misPuntos.setText(misP);
+                                misJuegos.setText(Integer.toString(misJ));
+                                misSets.setText(Integer.toString(misS));
+                                susPuntos.setText(susP);
+                                susJuegos.setText(Integer.toString(susJ));
+                                susSets.setText(Integer.toString(susS));
+                                Log.e("WEAR", "On UI run setText ---------------");
+                            }
+                        });
+                    }
+                }
+                dataItems.release();
+            }
+        });
     }
 
     void actualizaNumeros(int b) {
@@ -191,18 +226,19 @@ public class Contador extends WearableActivity implements MessageApi.MessageList
         susSets.setText(partida.getSusSets());
         sincronizarDatos(b);
     }
-    void sincronizarDatos(int b){
+
+    void sincronizarDatos(int b) {
         Log.e("Padel Wear", "Sincronizando");
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create(
                 MOBILE_PUNTUACION);
-        putDataMapReq.getDataMap().putByte(KEY_MIS_PUNTOS, partida
-                .getMisPuntosByte());
+        putDataMapReq.getDataMap().putString(KEY_MIS_PUNTOS, partida
+                .getMisPuntos());
         putDataMapReq.getDataMap().putByte(KEY_MIS_JUEGOS, partida
                 .getMisJuegosByte());
         putDataMapReq.getDataMap().putByte(KEY_MIS_SETS, partida
                 .getMisSetsByte());
-        putDataMapReq.getDataMap().putByte(KEY_SUS_PUNTOS, partida
-                .getSusPuntosByte());
+        putDataMapReq.getDataMap().putString(KEY_SUS_PUNTOS, partida
+                .getSusPuntos());
         putDataMapReq.getDataMap().putByte(KEY_SUS_JUEGOS, partida
                 .getSusJuegosByte());
         putDataMapReq.getDataMap().putByte(KEY_SUS_SETS, partida
@@ -211,8 +247,9 @@ public class Contador extends WearableActivity implements MessageApi.MessageList
 
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         Wearable.DataApi.putDataItem(apiClient, putDataReq);
-        Log.e("Padel Wear", "Request: "+putDataReq.toString());
+        Log.e("Padel Wear", "Request: " + putDataReq.toString());
     }
+
     @Override
     public void onEnterAmbient(Bundle ambientDetails) {
         super.onEnterAmbient(ambientDetails);
@@ -296,18 +333,19 @@ public class Contador extends WearableActivity implements MessageApi.MessageList
 
     @Override
     public void onDataChanged(DataEventBuffer eventos) {
-        Log.e("WEAR","onDataChanget ---------------");
+        Log.e("WEAR", "onDataChanget ---------------");
         for (DataEvent evento : eventos) {
-            if (evento.getType() == DataEvent.TYPE_CHANGED) { DataItem item = evento.getDataItem();
+            if (evento.getType() == DataEvent.TYPE_CHANGED) {
+                DataItem item = evento.getDataItem();
                 if (item.getUri().getPath().equals(WEAR_PUNTUACION)) {
-                    DataMap dataMap = DataMapItem.fromDataItem(item) .getDataMap();
-                    misP = dataMap.getByte(KEY_MIS_PUNTOS);
-                    susP = dataMap.getByte(KEY_SUS_PUNTOS);
+                    DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                    misP = dataMap.getString(KEY_MIS_PUNTOS);
+                    susP = dataMap.getString(KEY_SUS_PUNTOS);
                     misJ = dataMap.getByte(KEY_MIS_JUEGOS);
                     susJ = dataMap.getByte(KEY_SUS_JUEGOS);
                     misS = dataMap.getByte(KEY_MIS_SETS);
                     susS = dataMap.getByte(KEY_SUS_SETS);
-                    switch (dataMap.getInt(KEY_EQUIPO)){
+                    switch (dataMap.getInt(KEY_EQUIPO)) {
                         case -1:
                             partida.deshacerPunto();
                             break;
@@ -323,20 +361,23 @@ public class Contador extends WearableActivity implements MessageApi.MessageList
                         default:
                             break;
                     }
-                    Log.e("WEAR","getBytes ---------------");
+                    Log.e("WEAR", "getBytes ---------------");
                     runOnUiThread(new Runnable() {
-                        @Override public void run() {
-                            misPuntos.setText(Integer.toString(misP));
+                        @Override
+                        public void run() {
+                            misPuntos.setText(misP);
                             misJuegos.setText(Integer.toString(misJ));
                             misSets.setText(Integer.toString(misS));
-                            susPuntos.setText(Integer.toString(susP));
+                            susPuntos.setText(susP);
                             susJuegos.setText(Integer.toString(susJ));
                             susSets.setText(Integer.toString(susS));
-                            Log.e("WEAR","On UI run setText ---------------");
-                        } });
+                            Log.e("WEAR", "On UI run setText ---------------");
+                        }
+                    });
                 }
             } else if (evento.getType() == DataEvent.TYPE_DELETED) {
-            } }
+            }
+        }
     }
 
     @Override
