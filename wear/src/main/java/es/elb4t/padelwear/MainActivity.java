@@ -16,7 +16,7 @@ import static android.R.attr.tag;
 public class MainActivity extends Activity {
     // Elementos a mostrar en la lista
     String[] elementos = {"Partida", "Terminar partida", "Historial",
-            "Notificación", "Pasos", "Pulsaciones", "Terminar partida"};
+            "Jugadores", "Pasos", "Pulsaciones", "Terminar partida"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Integer tag = (Integer) v.getTag();
-                Log.e("LLISTA-----",tag.toString());
+                Log.e("LLISTA-----", tag.toString());
                 switch (tag) {
                     case 0:
                         startActivity(new Intent(MainActivity.this, Contador.class));
@@ -39,8 +39,12 @@ public class MainActivity extends Activity {
                     case 2:
                         startActivity(new Intent(MainActivity.this, Historial.class));
                         break;
+                    case 3:
+                        startActivity(new Intent(MainActivity.this, Jugadores.class));
+                        break;
                     case 4:
-                        startActivity(new Intent(MainActivity.this, Pasos.class)); break;
+                        startActivity(new Intent(MainActivity.this, Pasos.class));
+                        break;
                 }
             }
         });
