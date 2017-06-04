@@ -8,10 +8,18 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.DismissOverlayView;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -24,6 +32,10 @@ import es.elb4t.comun.Partida;
  */
 
 public class Contador extends WearableActivity {
+    private static final String MOVIL_ARRANCAR_ACTIVIDAD = "/arrancar_actividad";
+    private GoogleApiClient apiClient;
+
+
     private Partida partida;
     private TextView misPuntos, misJuegos, misSets,
             susPuntos, susJuegos, susSets;
@@ -145,6 +157,8 @@ public class Contador extends WearableActivity {
                 "Para salir de la aplicación, haz una pulsación larga");
         dismissOverlay.showIntroIfNecessary();
 
+        apiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
+        mandarMensaje(MOVIL_ARRANCAR_ACTIVIDAD, "");
     }
 
     void actualizaNumeros() {
@@ -196,5 +210,40 @@ public class Contador extends WearableActivity {
     public void onUpdateAmbient() {
         super.onUpdateAmbient();
         hora.setText(c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE));
+    }
+
+    private void mandarMensaje(final String path, final String texto) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                NodeApi.GetConnectedNodesResult nodos = Wearable.NodeApi.getConnectedNodes(apiClient).await();
+                for (Node nodo : nodos.getNodes()) {
+                    Wearable.MessageApi.sendMessage(apiClient, nodo.getId(), path, texto.getBytes())
+                            .setResultCallback(
+                                    new ResultCallback<MessageApi.SendMessageResult>() {
+                                        @Override
+                                        public void onResult(MessageApi.SendMessageResult resultado) {
+                                            if (!resultado.getStatus().isSuccess()) {
+                                                Log.e("sincronizacion", "Error al mandar mensaje. Código:" + resultado.getStatus().getStatusCode());
+                                            }
+                                        }
+                                    });
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    protected void onStop() {
+        if (apiClient != null && apiClient.isConnected()) {
+            apiClient.disconnect();
+        }
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        apiClient.connect();
     }
 }

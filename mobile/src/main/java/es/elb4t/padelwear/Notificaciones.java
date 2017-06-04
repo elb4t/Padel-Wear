@@ -63,18 +63,19 @@ public class Notificaciones extends AppCompatActivity {
                 // Creamos un BigTextStyle para la segunda página
                 NotificationCompat.BigTextStyle segundaPg =
                         new NotificationCompat.BigTextStyle();
-                segundaPg.setBigContentTitle("Página 2")
+                segundaPg
                         .bigText("Más texto.");
 // Creamos una notification para la segunda página
                 Notification notificacionPg2 = new NotificationCompat.Builder(
                         Notificaciones.this)
                         .setStyle(segundaPg)
+                        .setContentTitle("Página 2")
                         .build();
                 Notification notificacionPg3 = new NotificationCompat.Builder(
                         Notificaciones.this)
                         .setStyle(new NotificationCompat.BigTextStyle()
-                                .setBigContentTitle("Página 3")
                                 .bigText("Más texto todavia."))
+                        .setContentTitle("Página 3")
                         .build();
 
                 // Creamos un WearableExtender para añadir funcionalidades para wearable
