@@ -30,6 +30,7 @@
         <activity android:name=".CuentaAtras" />
         <activity android:name=".Jugadores"/>
         <activity android:name=".Contador" android:theme="@style/AppThemeNoSwipeToDismiss" />
+        <activity android:name=".Contador2" android:theme="@style/AppTheme" />
         <activity android:name=".Pasos2"/>
         <activity android:name=".Cardiaco"/>
 

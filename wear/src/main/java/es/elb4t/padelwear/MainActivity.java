@@ -15,7 +15,7 @@ import static android.R.attr.tag;
 
 public class MainActivity extends Activity {
     // Elementos a mostrar en la lista
-    String[] elementos = {"Partida", "Terminar partida", "Historial",
+    String[] elementos = {"Partida", "Contador2", "Historial",
             "Jugadores", "Pasos","Pasos2", "Pulsaciones", "Terminar partida"};
 
     @Override
@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
                         startActivity(new Intent(MainActivity.this, Contador.class));
                         break;
                     case 1:
-                        startActivity(new Intent(MainActivity.this, Confirmacion.class));
+                        startActivity(new Intent(MainActivity.this, Contador2.class));
                         break;
                     case 2:
                         startActivity(new Intent(MainActivity.this, Historial.class));
@@ -50,6 +50,9 @@ public class MainActivity extends Activity {
                         break;
                     case 6:
                         startActivity(new Intent(MainActivity.this, Cardiaco.class));
+                        break;
+                    case 7:
+                        startActivity(new Intent(MainActivity.this, Confirmacion.class));
                         break;
                 }
             }
